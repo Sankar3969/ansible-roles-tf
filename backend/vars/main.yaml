@@ -1,4 +1,4 @@
-login_password: "ExpenseApp@1"
-mysql_zone: "mysql.sankardevops.shop"
+login_password: "ExpenseApp1"
+mysql_zone: "mysql-dev.sankardevops.shop"
 app_location: /app
 component: backend
