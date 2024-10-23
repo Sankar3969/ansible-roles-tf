@@ -1,0 +1,66 @@
+    - name: mandatory installments PyMysql and crptgraphy
+      ansible.builtin.pip:
+        name: 
+         - PyMySQL
+         - cryptography
+        executable: pip3.9
+
+    - name: disabling the nodejs
+      ansible.builtin.command: dnf module disable nodejs -y
+
+    - name: enable the nodejs
+      ansible.builtin.command: dnf module enable nodejs:20 -y
+    
+    - name: install the package
+      ansible.builtin.package:
+        name: nodejs
+        state: present
+
+    - name: create user    
+      ansible.builtin.user:
+        name: expense 
+
+    - name: get the tasks from common and extract the code 
+      ansible.builtin.import_role:
+        name: common
+        tasks_from: app_pre_req
+
+     
+    - name: install the npm dependencies
+      tags: deployments 
+      ansible.builtin.command: npm install
+      args:
+        chdir: /app     
+        
+
+    - name: move backend service to the destination 
+      ansible.builtin.template:        
+        src: backend.service.j2
+        dest: /etc/systemd/system/backend.service
+        
+    - name: Restart service backend, in all cases
+      ansible.builtin.service:
+        name: backend
+        state: restarted  
+        enabled: true  
+
+    - name: install the mysql 
+      ansible.builtin.package:
+        name: mysql
+        state: present
+    
+    - name: connect to mysql to run the backend sql file
+      community.mysql.mysql_db:
+        login_user: root
+        login_password: "{{ login_password }}" 
+        login_host: "{{ mysql_zone }}"
+        target: /app/schema/backend.sql
+        name: all
+        state: import
+
+    - name: daemon reload for backend
+      ansible.builtin.systemd:
+        name: backend
+        state: restarted
+        daemon_reload: yes
+        enabled: true  

@@ -1,0 +1,34 @@
+  - name: install the nginx
+    ansible.builtin.package:
+      name: nginx
+      state: present
+  
+  - name: starting the nginx server
+    ansible.builtin.service:
+      name: nginx
+      state: restarted
+      enabled: yes
+
+  - name: get the tasks from common and extract the code 
+    ansible.builtin.import_role:
+        name: common
+        tasks_from: app_pre_req
+  
+  - name: extract the files from Zip file
+    ansible.builtin.unarchive:
+        src: /tmp/frontend.zip
+        dest: /usr/share/nginx/html   
+        remote_src: yes   
+  
+  - name: move expense service to the destination 
+    ansible.builtin.template:        
+        src: expense.conf.j2
+        dest: /etc/nginx/default.d/expense.conf 
+    notify:
+    - Restart nginx # This should match with handlers name 
+  # - name: starting the nginx server
+  #   ansible.builtin.service:
+  #     name: nginx
+  #     state: restarted
+  #     enabled: yes            
+      
