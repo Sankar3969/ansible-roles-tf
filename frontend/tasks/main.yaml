@@ -14,11 +14,11 @@
         name: common
         tasks_from: app_pre_req
   
-  - name: extract the files from Zip file
-    ansible.builtin.unarchive:
-        src: /tmp/frontend.zip
-        dest: /usr/share/nginx/html   
-        remote_src: yes   
+  # - name: extract the files from Zip file
+  #   ansible.builtin.unarchive:
+  #       src: /tmp/frontend.zip
+  #       dest: /usr/share/nginx/html   
+  #       remote_src: yes   
   
   - name: move expense service to the destination 
     ansible.builtin.template:        
